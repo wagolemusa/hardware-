@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main role="main" class="container">
+	<div class="jumbotron">
+		<form method="post" action="">
+			{% csrf_token %}
+			<h1>Are sure you want to delete?</h1><br/>
+			<input class="btn btn-danger" type="submit" value="yes">
+			<a href="/list_items"><div class="btn btn-primary">Cancel</a>
+		</div>
+	</div>
+	
+</main>
+
+{% endblock content %}
