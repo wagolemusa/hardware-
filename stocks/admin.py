@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Stock
+from .models import Stock, Category
 from .forms import StockCreateForm
 
 class StockCreateAdmin(admin.ModelAdmin):
@@ -9,4 +9,7 @@ class StockCreateAdmin(admin.ModelAdmin):
 	form = StockCreateForm
 	list_filter = ['category']
 	search_fields = ['category', 'item_name']
+
+
 admin.site.register(Stock, StockCreateAdmin)
+admin.site.register(Category)
