@@ -27,11 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'registration', #should be immediately above 'django.contrib.auth'
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -128,3 +127,8 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
 MEDIA_URL  = "/media/"
 MEDIA_ROOT  = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
+
+ACCOUNT_APPLICATION_DAYS = 7 # One-week activation window
+REGISTRATION_AUTO_LOGIN = True # Automatically log the user in
+SITE_ID = 1
+LOGIN_REDIRECT_URL = '/'

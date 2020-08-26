@@ -1,4 +1,22 @@
+body{
+	/*background-image: url("../img/b.jpg")*/
+	background-color: rgba(33, 41, 49, 1);
+font-family: 'Open Sans', 'Arial', sans-serif;
+/*color: #fff;*/
+overflow-x: hidden;
+}
 
+.navbar{
+	background-color: rgba(2, 11, 20, 1);
+min-height: 100px;
+padding-top: 12px;
+padding-bottom: 12px;
+}
+
+.navbar a {
+	font-weight: 800;
+	color: #fff;
+}
 .table{
 	font-size: 13px;
 	text-align: center;
@@ -22,17 +40,21 @@ th img {
 	width: 20px;
 }
 
+.mybutton {
+	width: 100%
+}
+
 .display_table{
 	border-bottom-right-radius: 20px;
 	padding-left: 5px;
 	padding-right: 5px;
 	padding-bottom: 20px;
-	box-shadow: 12px 12px 20px 6px #2e6da4;
+	box-shadow: 12px 12px 10px #2e6da4;
 }
 .header{
 	font-family: helvelica;
 	color: #337ab7;
-	font-size: 50px;
+	font-size: 30px;
 	text-align: center;
 	width: 100%;
 	text-shadow: 6px 6px 6px #c9c6c6;
@@ -46,4 +68,9 @@ th img {
 	color:white;
 	box-shadow: 12px 11px 12px #e61c66;
 	text-align: center;
+}
+
+.page-footer{
+	background-color: rgba(2, 11, 20, 1);
+
 }
