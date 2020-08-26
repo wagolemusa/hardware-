@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
-
 import os
+import django_heroku
+import dj_database_url
+import dotenv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -74,11 +76,31 @@ WSGI_APPLICATION = 'hardware.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
+
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': 'hardware',
+
+        'USER': 'postgres',
+
+        'PASSWORD': 'refuge',
+
+        'HOST': 'localhost',
+
+        'PORT': '5432',
+
     }
+
 }
 
 
@@ -118,15 +140,35 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     # '/var/www/static/',
 ]
+
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
-MEDIA_URL  = "/media/"
-MEDIA_ROOT  = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
+MEDIA_URL = "/media/"
+# MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media_cdn")
+
+django_heroku.settings(locals())
+
+
+
+# STATIC_URL = '/static/'
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+#     # '/var/www/static/',
+# ]
+# STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
+# MEDIA_URL  = "/media/"
+# MEDIA_ROOT  = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
 
 ACCOUNT_APPLICATION_DAYS = 7 # One-week activation window
 REGISTRATION_AUTO_LOGIN = True # Automatically log the user in
