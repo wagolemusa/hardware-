@@ -5,6 +5,7 @@ from .forms import *
 from django.http import HttpResponse
 import csv
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 def home(request):
 	title = "Welcome : this to the store"
@@ -13,7 +14,7 @@ def home(request):
 	}
 	return render(request, "home.html", context)
 
-
+@login_required
 def list_items(request):
 	form = StockSearchForm(request.POST or None)
 	querySet = Stock.objects.all()
@@ -40,10 +41,12 @@ def list_items(request):
 	}	 
 	return render(request, "list_items.html", context)
 
+@login_required
 def add_items(request):
 	form = StockCreateForm(request.POST or None)
 	if form.is_valid():
-		form.save()
+		instance = form.save(commit=False)
+		instance.save()
 		messages.success(request, 'Successfully Saved')
 		return redirect('/list_items')
 	context = {
@@ -52,6 +55,7 @@ def add_items(request):
 	}
 	return render(request, "add_items.html", context)
 
+@login_required
 def update_items(request, pk):
 	queryset = Stock.objects.get(id=pk)
 	form =  StockUpdateForm(instance=queryset)
@@ -67,6 +71,7 @@ def update_items(request, pk):
 	}
 	return render(request, 'add_items.html', context)
 
+@login_required
 def delete_items(request, pk):
 	queryset = Stock.objects.get(id=pk)
 	if request.method == 'POST':
@@ -82,6 +87,7 @@ def stock_details(request, pk):
 	}
 	return render(request, 'stock_details.html', context)
 
+@login_required
 def issue_items(request, pk):
 	queryset = Stock.objects.get(id=pk)
 	form  = IssueForm(request.POST or None, instance=queryset)
@@ -100,6 +106,7 @@ def issue_items(request, pk):
 	}
 	return render(request, "add_items.html", context)
 
+@login_required
 def receive_items(request, pk):
 	queryset = Stock.objects.get(id=pk)
 	form  = ReceiveForm(request.POST or None, instance=queryset)
@@ -118,6 +125,7 @@ def receive_items(request, pk):
 	}
 	return render(request, "add_items.html", context)
 
+@login_required
 def reoder_level(request, pk):
 	queryset = Stock.objects.get(id=pk)
 	form = ReoderLevelForm(request.POST or None, instance=queryset)

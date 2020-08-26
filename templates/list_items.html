@@ -3,35 +3,35 @@
 
 <h1>List of Items</h1>
 
-<main role="main" class="container">
-{% if messages %}
-	<ul class="messages">
-			{% for message in messages%}
-				<li {% if message.tags %} class="{{ message.tags }}" {% endif %}> {{ message }} </li>
-				{% endfor %}
-			</ul>
-		{% endif %}	
-</main>
+
+<div class="container-fluid">
 <div class="jumbotron">
 
-	<div class="header">{{ title }}</div>
-
+	<div class="row">
+		<div class="col-md-2">
+		<div class="display_table">
+		<div class="header">Seach Data</div>
 		<form method="POST" action="">{% csrf_token %}
 			{{ form.as_p }}
-			<input type="submit" value="Search">
+			<input class="btn btn-primary mybutton" type="submit" value="Search">
 		</form>
+		<a href="/add_items"><div class="btn btn-primary mybutton">Add Item</div></a>
+		</div></div>
 		<br>
+
+		<div class="col-md-10">
+		<div class="header">List of Items</div>
 		<div class="display_table">
 		<table class="table">
 
 			<thead>
 				<tr>
-					<th>COUNT</th>
+					<!-- <th>COUNT</th> -->
 					<th>CATEGORY</th>
 					<th>ITEM NAME</th>
 					<th>QUANTITY IN STORE</th>
 					<th>RECOARD LEVEL</th>
-					<th>TIMESTAMP</th>
+					<!-- <th>TIMESTAMP</th> -->
 					<th>LAST UPDATED</th>
 					<th>DELETE</th>
 				</tr>
@@ -40,7 +40,7 @@
 				<tr>
 		
 
-					<td>{{ forloop.counter }}</td>
+					<!-- <td>{{ forloop.counter }}</td> -->
 					<td>{{ instance.category }}</td>
 					<td><a href="{% url 'update_items' instance.id %}">{{ instance.item_name }}</a></td>
 
@@ -59,8 +59,8 @@
 						<a href="{% url 'reoder_level' instance.id %}">{{ instance.reoder_level }}</a>
 					</td>
 					<td>{{ instance.last_updated }}</td>
-					<td>{{ instance.timestamp }}
-					<td><a href="{% url 'delete_items' instance.id %}"><img src="../static/n.png" style="width: 25px;">
+					<!-- <td>{{ instance.timestamp }}</td> -->
+					<td><a href="{% url 'delete_items' instance.id %}"><img src="../static/n.png" style="width: 25px;"></a>
 					</td>
 				</tr>
 
@@ -68,6 +68,8 @@
 			</table>
 			</div>
 		</div>
-
+</div>
+</div>
+</div>
 </main>
 {% endblock content %}

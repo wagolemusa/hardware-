@@ -2,6 +2,16 @@ from django import forms
 from .models import Stock
 
 class StockCreateForm(forms.ModelForm):
+	# category = forms.CharField(widget=forms.TextInput(attrs={
+	# 	'class': 'form-control'
+	# 	}))
+	item_name = forms.CharField(widget=forms.TextInput(attrs={
+		'class': 'form-control'
+		}))
+	quantity = forms.CharField(widget=forms.NumberInput(attrs={
+		'class': 'form-control'
+		}))
+
 	class Meta:
 		model = Stock
 		fields = ['category', 'item_name', 'quantity']
@@ -23,6 +33,9 @@ class StockCreateForm(forms.ModelForm):
 		return item_name
 
 class StockSearchForm(forms.ModelForm):
+	item_name = forms.CharField(widget=forms.TextInput(attrs={
+		'class': 'form-control'
+		}))
 	export_to_CSV = forms.BooleanField(required=False)
 	class Meta:
 		model = Stock
