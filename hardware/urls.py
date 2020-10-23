@@ -18,9 +18,10 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from stocks import views
+# from shops import views
 
 urlpatterns = [
-	path('', views.home, name='home'),
+	path('stocks/', views.home, name='home'),
 	path('list_items/', views.list_items, name='list_names'),
     path('add_items/', views.add_items, name='add_items'),
     path('update_items/<str:pk>/', views.update_items, name="update_items"),
@@ -29,8 +30,11 @@ urlpatterns = [
     path('issue_items/<str:pk>/', views.issue_items, name="issue_items"),
     path('receive_items/<str:pk>/', views.receive_items, name="receive_items"),
     path('reoder_level/<str:pk>/', views.reoder_level, name="reoder_level"),
-    path('accounts/', include('registration.backends.default.urls')),
+    # path('accounts/', include('registration.backends.default.urls')),
+    path('accounts/', include('allauth.urls')),
     path('admin/', admin.site.urls),
+    path('', include('shops.urls', namespace='shops')),
+
 ]
 
 if settings.DEBUG:
