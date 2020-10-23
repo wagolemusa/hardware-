@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Wise wsie</h2>
+
+<h3>{{ instance.title }}</h3>
+
+<p class="lead">
+	{% if instance.discount_price %}
+	<span class="mr-1">
+		<del>${{ instance.price }}</del>
+	</span>
+	<span>${{ instance.discount_price }}</span>
+	{% else %}
+	<span>${{ instance.price }}</span>
+</p>
+
+<h3>{{ instance.price }}</h3>
+{% endif %}
+<a href="{{ instance.get_add_to_cart_url }}" class="btn btn-primary btn-md my-0 p">
+	Add to Cart
+	<i class="fas fa-shopping-cart ml-1"></i>
+
+</a>
+
+<a href="{{ instance.get_remove_from_cart_url }}" class="btn btn-danger btn-md my-0 p">
+	Remove to Cart
+	<i class="fas fa-shopping-cart ml-1"></i>
+
+</a>
+
+{% endblock content %}

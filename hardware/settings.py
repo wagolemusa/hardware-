@@ -32,14 +32,20 @@ ALLOWED_HOSTS = []
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'registration', #should be immediately above 'django.contrib.auth'
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'crispy_forms',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'crispy_forms',
+    # 'django_crispy_bulma',
+    'shops',
     'stocks',
+    
 ]
 # CRISPY_TEMPLATE_PACK = 'bootstrap4'
 MIDDLEWARE = [
@@ -89,7 +95,7 @@ DATABASES = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-        'NAME': 'hardware',
+        'NAME': 'hardwarestore',
 
         'USER': 'postgres',
 
@@ -159,18 +165,23 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media_cdn")
 django_heroku.settings(locals())
 
 
-
-# STATIC_URL = '/static/'
-
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, "static"),
-#     # '/var/www/static/',
-# ]
-# STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
-# MEDIA_URL  = "/media/"
-# MEDIA_ROOT  = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
-
-ACCOUNT_APPLICATION_DAYS = 7 # One-week activation window
-REGISTRATION_AUTO_LOGIN = True # Automatically log the user in
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
+
+# CRISPY FORMS
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# CRISPY FORMS
+# CRISPY_ALLOWED_TEMPLATE_PACKS = (
+#     "bootstrap",
+#     "uni_form",
+#     "bootstrap3",
+#     "bootstrap4",
+#     "bulma",
+# )
+
+# CRISPY_TEMPLATE_PACK = "bulma"
