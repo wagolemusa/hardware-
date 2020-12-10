@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+<div class="row">
+<h2>Item Customer List</h2>
+
+	<form method="POST" action="">{% csrf_token %}
+			{{ form.as_p }}
+			<input class="btn btn-primary mybutton" type="submit" value="Search">
+	</form>
+
+<div class="table-responsive text-nowrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Item title</th>
+        <th scope="col">Category</th>
+        <th scope="col">Price</th>
+        <th scope="col">Discount</th>
+        <th scope="col"></th>
+        
+      </tr>
+    </thead>
+    <tbody>
+    {% for order_item in querySet %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ order_item.title }}</td>
+        <td>{{ order_item.category }}</td>
+        <td>{{ order_item.price }}</td>
+
+        <td>{{ order_item.discout_price }}</td>
+        <td>
+        <a href="{{ order_item.get_add_to_cart_url }}" class="btn 	btn-primary btn-md my-0 p">
+					Add to Cart
+				<i class="fas fa-shopping-cart ml-1"></i>
+
+			</a>
+			</td></tr>
+
+
+      	{% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+</div>
+</div>
+{% endblock content%}

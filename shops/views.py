@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin 
-
+from .forms import *
 
 def index(request):
 	context = {
@@ -33,6 +33,25 @@ def products(request, slug):
 	}
 	return render(request, "product.html", context)
 
+""" Customer List """
+def costomer_list(request):
+	form = StockSearchForm(request.POST or None)
+	querySet = Item.objects.all()
+	# context = {
+	# 	"querySet": querySet,
+	# 	"form":form
+	# }
+	if request.method == 'POST':
+		querySet = Item.objects.filter(title__icontains=form['title'].value())
+		
+	# querySet = Item.objects.all()
+	context = {
+		'querySet': querySet,
+		"form":form
+	}
+	return render(request, "costomer_list.html", context)
+
+
 # class ItemDetailveiw(DetailView):
 # 	model = Item
 # 	template_name = "product.html"
@@ -48,7 +67,6 @@ class OrderSummaryView(LoginRequiredMixin, View):
 		except ObjectDoesNotExist:
 			messages.error(self.request, "You do not have an active order")
 			return redirect("/")
-
 
 """ Add To Cart """
 @login_required
