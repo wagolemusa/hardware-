@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load crispy_forms_tags %}
+
+<div class="container">
+	<div class="col-md-8 md-4">
+		<div class="card">
+			<form method="POST" class="card-body">
+				{% csrf_token %}
+			
+			<label for="address" class="">Your Town/City</label><br/>
+				{{ form.town }}<br/>
+			<label for="address" class="">Working Phone Number</label><br/>
+			{{ form.phone }}<br/>
+			<label for="address" class="">ID Number</label><br/>
+				{{ form.id_number }}<br/>
+
+   <hr>
+  <div class="custom-control custom-checkbox">
+   <input {% if form.same_shipping_address.value %}checked{% endif %} type="checkbox" name="same_biliing_address" class="custom-control-input" id="same-address">
+   <label class="custom-control-label" for="same-address">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Shipping address is the same as my billing address</label>
+  </div>
+ <div class="custom-control custom-checkbox">
+  <input {% if form.save_info.value %}checked{% endif %} type="checkbox" name="save_info" class="custom-control-input" id="save-info">
+ <label class="custom-control-label" for="save-info">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Save this Information for next time</label>
+	</div>
+<hr>
+	<div class="d-block my-3">
+	{% for value, name in form.fields.payment_option.choices %}
+			<div class="custom-control custom-radio">
+				<input id="{{ name }}" name="payment_option" value="{{ value }}" type="radio" class="custom-control-input checked required">
+
+				<label class="custom-control-label" for="{{ name }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ name}}</label>
+					</div>
+			{% endfor %}
+			
+		</div>
+			
+				<button class="btn btn-primary" type="submit">Checkout</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+{% endblock content %}
