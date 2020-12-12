@@ -8,6 +8,7 @@ from .views import (
 	add_to_cart,
 	remove_from_cart,
 	OrderSummaryView,
+	CheckoutView,
 	remove_single_from_cart
 	
 )
@@ -18,6 +19,7 @@ app_name = 'shops'
 urlpatterns = [
 	path('', index, name = 'index'),
 	path('shops/item_list', item_list, name='item_list'), 
+	path('checkout/', CheckoutView.as_view(), name='checkout'),
 	path('costomer_list', costomer_list, name='costomer_list'),
 	path('product/<slug>/', products, name='product'),
 	path('order-summary', OrderSummaryView.as_view(), name='order-summary'),
