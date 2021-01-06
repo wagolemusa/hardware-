@@ -1,5 +1,4 @@
-<div class="container">
-<div class="col-md-12 mb-4">
+
  <!-- Heading -->
  <h4 class="d-flex justify-content-between align-items-center mb-3">
 <span class="text-muted">Your cart</span>
@@ -29,7 +28,7 @@
 {% endif %}
  <li class="list-group-item d-flex justify-content-between">
     <span>Total (Ksh)</span>
-  <strong>Shs| {{ order.get_total }}</strong>
+  <strong>Shs{{ order.get_total }}</strong>
   </li>
   </ul>
  <!-- Cart -->
@@ -37,7 +36,7 @@
  <!-- Promo code -->
  {% if DISPLAY_COUPON_FORM %}
 <form class="card p-2" action="{% url 'shops:add-coupan' %}" method="POST">
-  	{% csrf_token %}
+    {% csrf_token %}
   <div class="input-group">
     {{ couponform.code }}
     <div class="input-group-append">
@@ -48,5 +47,3 @@
 {% endif %}
 <!-- Promo code -->
  
-</div>
-</div>
