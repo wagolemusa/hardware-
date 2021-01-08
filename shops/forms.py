@@ -36,7 +36,10 @@ class StockSearchForm(forms.ModelForm):
 class CouponForm(forms.Form):
 	code = forms.CharField(widget=forms.TextInput(attrs={
 		'class':'form-control',
-		'placeholder': 'Promo code',
-		'aria-label': 'Recipient\'s username',
-		'aria-describedy': 'basic-addon2'
+		'placeholder': 'Promo code'
 		}))
+
+class RefundForm(forms.Form):
+	ref_code = forms.CharField()
+	message = forms.CharField(widget=forms.Textarea)
+	email = forms.EmailField()
