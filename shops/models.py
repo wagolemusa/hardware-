@@ -4,6 +4,10 @@ from django.views.generic import ListView, DetailView
 from django.conf import settings
 from django.shortcuts import reverse
 
+ADDRESS_CHOICES = (
+	('B', 'Billing'),
+	('S', 'Shipping')
+)
 class Item(models.Model):
 	title = models.CharField(max_length=100)
 	price = models.FloatField()
@@ -58,18 +62,23 @@ class OrderItem(models.Model):
 		return self.get_total_price()
 
 class Order(models.Model):
-	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL,
+													on_delete=models.CASCADE)
+	ref_code = models.CharField(max_length=20)
 	items = models.ManyToManyField(OrderItem)
 	start_date = models.DateTimeField(auto_now_add=True)
 	ordered_date = models.DateTimeField()
 	ordered = models.BooleanField(default=False)
-
-	billing_address	= models.ForeignKey(
+	billing_address = models.ForeignKey(
 		'BillingAddress', on_delete=models.SET_NULL, blank=True, null=True)
-	payment	= models.ForeignKey(
+	payment = models.ForeignKey(
 		'Payment', on_delete=models.SET_NULL, blank=True, null=True)
 	coupon = models.ForeignKey(
 		'Coupon', on_delete=models.SET_NULL, blank=True, null=True)
+	being_delivered = models.BooleanField(default=False)
+	received_requested = models.BooleanField(default=False)
+	refund_requested = models.BooleanField(default=False)
+	refund_granted = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.user.username
@@ -110,3 +119,12 @@ class Coupon(models.Model):
 
 	def __str__(self):
 		return self.code
+
+class Refund(models.Model):
+	order = models.ForeignKey(Order, on_delete=models.CASCADE)
+	reason = models.TextField()
+	accepted = models.BooleanField(default=False)
+	email = models.EmailField(max_length=100)
+
+	def __str__(self):
+		return "%s" %(self.pk)

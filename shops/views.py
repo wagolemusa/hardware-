@@ -11,8 +11,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin 
 from .forms import *
 import stripe
+import random
+import string	
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
+def create_ref_code():
+	return ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
 def index(request):
 	context = {
 		'items': Item.objects.all()
@@ -98,11 +102,12 @@ class CheckoutView(View):
 				# save_info = form.cleaned_data.get('save_info')
 				payment_option = form.cleaned_data.get('payment_option')
 				
-				billing_address = BillingAddress(
+				billing_address = BillingAddres(
 					user=self.request.user,
 					town=town,
 					phone=phone,
-					id_number=id_number
+					id_number=id_number,
+					address_type = 'B'
 				)
 				billing_address.save()
 				order.billing_address = billing_address
@@ -161,6 +166,8 @@ class PaymentView(View):
 				
 			order.ordered = True
 			order.payment = payment
+			# assign ref code
+			order.ref_code.create_ref_code()
 			order.save() 
 
 			messages.success(self.request, "Your order was successfull")
@@ -370,3 +377,37 @@ class RequestRefundView(View):
 				messages.info(self.request, "This order does not exit.")
 				return redirect("shops:request-refund")
 
+class RequestRefundView(View):
+	def get(self, *args, **kwargs):
+		form = RefundForm()
+		context = {
+			'form':form
+		}
+		return render(self.request, "request_refund.html", context)
+
+	def post(self, *args, **kwargs):
+		form = RefundForm(self.request.POST)
+		if form.is_valid():
+			ref_code = form.cleaned_data.get('ref_code')
+			message = form.cleaned_data.get('message')
+			email = form.cleaned_data.get('email')
+			# edit the order
+			# This checks if the ref-code exits
+			try:
+				order = Order.objects.get(ref_code=ref_code)
+				order.refund_requested = True
+				order.save()
+
+				# store the return
+				refund = Refund()
+				refund.order = order
+				refund.reason = message
+				refund.email = email
+				refund.save()
+
+				messages.info(self.request, "Your request was recived")
+				return redirect("shops:request-refund")
+
+			except ObjectDoesNotExist:
+				messages.info(self.request, "This order does not exist")
+				return redirect("shops:request-refund")
