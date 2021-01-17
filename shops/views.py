@@ -4,11 +4,12 @@ from django.views.generic import ListView, DetailView, View
 from django.shortcuts import redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from .models import Item, OrderItem, Order, BillingAddress, Payment, Coupon
+from .models import Item, OrderItem, Order, BillingAddress, Payment, Coupon, Category
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin 
+from django.views.generic import TemplateView
 from .forms import *
 import stripe
 import random
@@ -17,9 +18,14 @@ stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
 def create_ref_code():
 	return ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
+
 def index(request):
+	items = Item.objects.all()
+
+	cat = Category.objects.all()
 	context = {
-		'items': Item.objects.all()
+		'items': items,
+		'cat':cat,
 	}
 	return render(request, "index.html", context)
 
@@ -29,14 +35,21 @@ def item_list(request):
 	}
 	return render(request, "item_list.html", context)
 
-def products(request, slug):
-	instance = get_object_or_404(Item, slug=slug)
+def products(request, id=None):
+	instance = get_object_or_404(Item, id=id)
 	# instance = Item.filter(slug=slug)
-
+	# category = get_object_or_404(Category, id=id)
+	# category = Category.objects.get(id=id)
+	show = Item.objects.all()
+	cat = Category.objects.all()
 	context = {
 		"instance":instance,
+		"show":show,
+		"cat":cat
 	}
 	return render(request, "product.html", context)
+
+
 
 """ Customer List """
 def costomer_list(request):
@@ -57,11 +70,26 @@ def costomer_list(request):
 	return render(request, "costomer_list.html", context)
 
 
+def category(request, id=None):
+	categories = Category.objects.all()
+	if id:
+		category = get_object_or_404(Category, id=id)
+		item = Item.objects.filter(category=category)
+		cat = Category.objects.all()
+		
+	context = {
+		'categories': categories,
+		'category': category,
+		'item':item,
+		"cat":cat
+	}
+	return render(request, "category.html", context)
+
 # class ItemDetailveiw(DetailView):
 # 	model = Item
 # 	template_name = "product.html"
 
-class OrderSummaryView(LoginRequiredMixin, View):
+class OrderSummaryView(LoginRequiredMixin, View): 
 	def get(self, *args, **kwargs):
 		try:
 			order = Order.objects.get(user=self.request.user, ordered=False)
@@ -213,8 +241,8 @@ class PaymentView(View):
 
 """ Add To Cart """
 @login_required
-def add_to_cart(request, slug):
-	item = get_object_or_404(Item, slug=slug)
+def add_to_cart(request, id=None):
+	item = get_object_or_404(Item, id=id)
 	order_item, created  = OrderItem.objects.get_or_create(
 			item=item,
 			user=request.user,
@@ -224,7 +252,7 @@ def add_to_cart(request, slug):
 	if order_qs.exists():
 		order = order_qs[0]
 		# check if the order item is in the order
-		if order.items.filter(item__slug=item.slug).exists():
+		if order.items.filter(item__id=item.id).exists():
 			order_item.quantity += 1
 			order_item.save()
 			messages.info(request, "This item was updated.")
@@ -244,8 +272,8 @@ def add_to_cart(request, slug):
 
 """ Remove Form Cart """
 @login_required
-def remove_from_cart(request, slug):
-	item = get_object_or_404(Item, slug=slug)
+def remove_from_cart(request, id=None):
+	item = get_object_or_404(Item, id=id)
 	# Check if user has orders
 	order_qs = Order.objects.filter(
 		user=request.user,
@@ -254,7 +282,7 @@ def remove_from_cart(request, slug):
 	if order_qs.exists():
 		order = order_qs[0]
 
-		if order.items.filter(item__slug=item.slug).exists():
+		if order.items.filter(item__id=item.id).exists():
 			order_item = OrderItem.objects.filter(
 				item=item,
 				user=request.user,
@@ -265,16 +293,16 @@ def remove_from_cart(request, slug):
 			return redirect("shops:order-summary")	
 		else:
 			messages.info(request, "This was not in Cart")
-			return redirect("shops:product", slug=slug)			
+			return redirect("shops:product", id=id)			
 	else:
 		messages.info(request, "You do not have an active order")
-		return redirect("shops:product", slug=slug)
+		return redirect("shops:product", id=id)
 
 
 """ Remove Form Cart """
 @login_required
-def remove_single_from_cart(request, slug):
-	item = get_object_or_404(Item, slug=slug)
+def remove_single_from_cart(request, id=id):
+	item = get_object_or_404(Item, id=id)
 	# Check if user has orders
 	order_qs = Order.objects.filter(
 		user=request.user,
@@ -283,7 +311,7 @@ def remove_single_from_cart(request, slug):
 	if order_qs.exists():
 		order = order_qs[0]
 
-		if order.items.filter(item__slug=item.slug).exists():
+		if order.items.filter(item__id=item.id).exists():
 			order_item = OrderItem.objects.filter(
 				item=item,
 				user=request.user,
@@ -298,10 +326,10 @@ def remove_single_from_cart(request, slug):
 			return redirect("shops:order-summary")	
 		else:
 			messages.info(request, "This was not in Cart")
-			return redirect("shops:product", slug=slug)			
+			return redirect("shops:product", id=id)			
 	else:
 		messages.info(request, "You do not have an active order")
-		return redirect("shops:product", slug=slug)
+		return redirect("shops:product", id=id)
 
 
 def get_coupon(request, code):

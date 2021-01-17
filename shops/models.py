@@ -3,36 +3,53 @@ from django.views.generic import ListView, DetailView
 # Create your models here.
 from django.conf import settings
 from django.shortcuts import reverse
+from django.db.models.signals import pre_save
+from django.utils.text import slugify
 
 ADDRESS_CHOICES = (
 	('B', 'Billing'),
 	('S', 'Shipping')
 )
+
+class Category(models.Model):
+	name = models.CharField(max_length=30)
+
+	def __str__(self):
+		return self.name
+
+	def get_category_absolete_url(self):
+		return reverse('shops:category', args=[self.id])
+
 class Item(models.Model):
+	category = models.ForeignKey(Category, on_delete=models.CASCADE,
+                    related_name="category_set")
 	title = models.CharField(max_length=100)
 	price = models.FloatField()
 	discout_price = models.FloatField(blank=True, null=True)
-	slug = models.SlugField()
 	quantity = models.IntegerField(default=1)
 	image = models.ImageField()
+	content = models.TextField()
 
 	def __str__(self):
 		return self.title
 
 	def get_absolute_url(self):
 		return reverse("shops:product", kwargs={
-			'slug': self.slug
+			"id": self.id
 		})
 
 	def get_add_to_cart_url(self):
 		return reverse("shops:add_to_cart", kwargs={
-			'slug': self.slug
+			'id': self.id
 		})
 
 	def get_remove_from_cart_url(self):
 		return reverse("shops:remove_from_cart", kwargs={
-			'slug': self.slug
+			'id': self.id
 		})
+
+
+
 
 class OrderItem(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, 
@@ -128,3 +145,5 @@ class Refund(models.Model):
 
 	def __str__(self):
 		return "%s" %(self.pk)
+
+

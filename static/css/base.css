@@ -75,3 +75,7 @@ th img {
 	background-color: rgba(2, 11, 20, 1);
 
 }
+
+.show-on-hover:hover > ul.dropdown-menu {
+    display: block;    
+}

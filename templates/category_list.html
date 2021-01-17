@@ -1,0 +1,8 @@
+{% block content %}
+
+	<h2>All Categories</h2>
+	{% for item in category_list %}
+	
+		<a href="{{ item.get_category_absolete_url }}">{{ item }}</a>
+
+{% endblock %}
