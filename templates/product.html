@@ -30,4 +30,29 @@
 
 </a>
 
+  <div class="row">
+    {% for category in show %}
+
+      <div class="col-md-2">
+        <div class="card mb-2">
+       <div class="view overlay">
+          <div class="image">
+
+          <img src="{{ category.image.url }}" class="card-img-top" alt=""> 
+
+            <a href="{{ category.get_absolute_url }}">
+          
+            <div class="mask rgba-white-slight"></div>
+          </a>
+          </div>
+          <h6 style="padding-left: 10px; padding-top: 5px; font-weight: bold;">Ksh {{ category.price }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+    <!--/.Third slide-->
+  </div>
+  <!--/.Slides-->
 {% endblock content %}

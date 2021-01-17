@@ -13,6 +13,24 @@
          
         </a>
       </li>
+
+      <li>
+    <!-- Our Special dropdown has class show-on-hover -->
+        <div class="btn-group show-on-hover">
+            <a href="#" style="padding-top: 9px;"> Category</a> 
+          <ul class="dropdown-menu" role="menu">
+
+          {% for item in cat %}
+          <li>
+            <a href="{{ item.get_category_absolete_url }}">{{ item }}</a>
+          </li>
+           {% endfor %}
+          </ul>
+
+          
+        </div>
+        </li>
+       
       {% if request.user.is_authenticated %}
       <li class="nav-item">
         <!-- <a class="nav-link" href="/add_items">Add Items</a> -->

@@ -24,10 +24,10 @@
         <td>{{ order_item.item.title }}</td>
         <td>{{ order_item.item.price }}</td>
         <td>
-        <a href="{% url 'shops:remove_single_from_cart' order_item.item.slug %}">
+        <a href="{% url 'shops:remove_single_from_cart' order_item.item.id %}">
         <i class="fas fa-minus mr-2"></i></a>
         	{{ order_item.quantity }}
-        <a href="{% url 'shops:add_to_cart' order_item.item.slug %}">
+        <a href="{% url 'shops:add_to_cart' order_item.item.id %}">
         <i class="fas fa-plus mr-2"></i></a>
 
         </td>
@@ -38,7 +38,7 @@
         	{% else %}
         		Ksh {{ order_item.get_total_price }}
         	{% endif %}
-					<a href="{% url 'shops:remove_from_cart' order_item.item.slug %}">
+					<a href="{% url 'shops:remove_from_cart' order_item.item.id %}">
         	<i class="far fa-trash-alt float-right"></i>
         	</a>
         </td>

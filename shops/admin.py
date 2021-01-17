@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Item, OrderItem, Order, Payment, BillingAddress, Coupon, Refund
+from .models import Item, OrderItem, Order, Payment, BillingAddress, Coupon, Refund, Category
 
 def make_refund_accepted(modeladmin, request, queryset):
 	queryset.update(refund_requested=False, refund_granted=True)
@@ -39,10 +39,15 @@ class OrderAdmin(admin.ModelAdmin):
 
 	actions = [make_refund_accepted]
 
+class CategoryAdmin(admin.ModelAdmin):
+	list_display = [
+			'name'
+	]
 
 admin.site.register(Item)
 admin.site.register(OrderItem)
 admin.site.register(Order, OrderAdmin)
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Payment)
 admin.site.register(BillingAddress)
 admin.site.register(Coupon)
