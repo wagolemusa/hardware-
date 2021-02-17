@@ -4,16 +4,26 @@ from django.views.generic import ListView, DetailView, View
 from django.shortcuts import redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from .models import Item, OrderItem, Order, BillingAddress, Payment, Coupon, Category
+from .models import Item, OrderItem, Order, BillingAddress, Payment, Coupon, Category, Cash, Mpesapay 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin 
 from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from .forms import *
 import stripe
 import random
 import string	
+import requests
+import africastalking
+import ssl
+import json
+import datetime
+import base64
+from requests.auth import HTTPBasicAuth
+# from datetime import datetime, timedelta
 stripe.api_key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
 def create_ref_code():
@@ -130,12 +140,12 @@ class CheckoutView(View):
 				# save_info = form.cleaned_data.get('save_info')
 				payment_option = form.cleaned_data.get('payment_option')
 				
-				billing_address = BillingAddres(
+				billing_address = BillingAddress(
 					user=self.request.user,
 					town=town,
 					phone=phone,
 					id_number=id_number,
-					address_type = 'B'
+					# address_type = 'B'
 				)
 				billing_address.save()
 				order.billing_address = billing_address
@@ -156,7 +166,7 @@ class CheckoutView(View):
 class PaymentView(View):
 	def get(self, *args, **kwargs):
 		order = Order.objects.get(user=self.request.user, ordered=False)
-		if oredr.billing_address:
+		if order.billing_address:
 
 			context = {
 				'order':order,
@@ -237,7 +247,7 @@ class PaymentView(View):
 		  # Something else happened, completely unrelated to Stripe
 		  # Send an email to ourselves
 		  messages.error(self.request, "A serious error occurred. We have been notified")
-		  return redirect("/")
+		return redirect("/")
 
 """ Add To Cart """
 @login_required
@@ -423,3 +433,214 @@ class RequestRefundView(View):
 			except ObjectDoesNotExist:
 				messages.info(self.request, "This order does not exist")
 				return redirect("shops:request-refund")
+
+# Cash payment on Desktop
+@method_decorator(login_required, name='dispatch')
+class CashDesk(LoginRequiredMixin, View):
+	def get(self, *args, **kwargs):
+		form = CashPay()
+		order = Order.objects.get(user=self.request.user, ordered=False)
+		context = {
+		
+			'order': order,
+			'form': form
+		}
+		return render( self.request, "cashmaney.html", context)
+	
+	def post(self, *args, **kwargs):
+	
+		order = Order.objects.get(user=self.request.user, ordered=False)
+		amount = int(order.get_total())
+		cashpay = Cash()
+		cashpay.user = self.request.user
+		cashpay.amount = amount
+		cashpay.save()
+		# except ObjectDoesNotExist:
+		
+		# order_items = order.items.all()
+		# order_items.update(ordered=True)
+		# for item in order_items:
+		# 	item.save()
+		order_items = Order.objects.filter(user = self.request.user, ordered=False)
+		order_items.update(ordered=True)
+		for item in order_items:
+			item.save()
+
+		reciept = 'payed'
+		orderpay = Order.objects.filter(user = self.request.user, pay='notpayed')
+		orderpay.update(pay=reciept)
+
+
+		messages.info(self.request, "You do not have an active oredr")
+		return redirect("shops:printcash")
+
+@method_decorator(login_required, name='dispatch')
+class CashDeskprint(LoginRequiredMixin, View):
+	def get(self, *args, **kwargs):
+		order = Order.objects.filter(user=self.request.user, pay='payed').order_by('-timestamp')[:1]
+		# cash = "SELECT * FROM shops_order WHERE ordered = 'True'"
+		# order = Order.objects.raw(cash)
+		# order = Cash.objects.filter(user=self.request.user).order_by('-timestamp')
+		# tatol = Order.objects.aggregate(sum())
+		context = {
+			'order': order
+		}
+		return render( self.request, "printcash.html", context)
+	
+
+# Mpesa implimataions
+# @login_required
+@method_decorator(login_required, name='dispatch')
+class Mpesa(LoginRequiredMixin, View):
+	def get(self, *args, **kwargs):
+		form = Mpesaform()
+		order = Order.objects.get(user=self.request.user, ordered=False)
+		context = {
+			'order': order,
+			'form': form
+		}
+		return render(self.request, "mpesa.html", context)
+
+	def post(self, *args, **kwargs):
+		form = Mpesaform(self.request.POST or None)
+		try:
+			order = Order.objects.get(user=self.request.user, ordered=False)
+			amount = int(order.get_total())
+			print(amount)
+			if form.is_valid():
+				phone = form.cleaned_data.get('phone')
+
+				pay_bills = Mpesapay()
+				pay_bills.user = self.request.user
+				pay_bills.phone=phone
+				pay_bills.amount=amount
+				pay_bills.save()
+				
+				# Lipa na mpesa Functionality 
+				consumer_key = "EKyBEUXldtz0pAlmfv6fDELROh5vwQH0"
+				consumer_secret = "KADx7lxZWJdU0TcW"
+
+				# api_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" #AUTH URL
+				api_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+
+				r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
+
+				data = r.json()
+				access_token = "Bearer" + ' ' + data['access_token']
+
+				#GETTING THE PASSWORD
+				timestamp = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
+				passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
+				business_short_code = "174379"
+				data = business_short_code + passkey + timestamp
+				encoded = base64.b64encode(data.encode())
+				password = encoded.decode('utf-8')
+				# BODY OR PAYLOAD
+				payload = {
+				    "BusinessShortCode": business_short_code,
+				    "Password": password,
+				    "Timestamp": timestamp,
+				    "TransactionType": "CustomerPayBillOnline",
+				    "Amount": amount,
+				    "PartyA": phone,
+				    "PartyB": business_short_code,
+				    "PhoneNumber": phone,
+				    "CallBackURL": "https://hardwarekisumu.herokuapp.com/callbackurl",
+				    "AccountReference": "account",
+				    "TransactionDesc": "account"
+				}
+
+				#POPULAING THE HTTP HEADER
+				headers = {
+				    "Authorization": access_token,
+				    "Content-Type": "application/json"
+				}
+				url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest" #C2B URL
+				response = requests.post(url, json=payload, headers=headers)
+				print (response.text)
+				# return {"message": 'Wait Response on Your phone'}
+				messages.success(self.request, "Wait Response on Your phone")
+				return redirect("/")
+		except ObjectDoesNotExist:
+			messages.error(self.request, "You do not have an active order")
+			return redirect("shops:order-summary")
+
+# @login_required
+@csrf_exempt
+def callbackurl(request):
+	# def get(self, *args, **kwargs):
+	# 	# def callbackurl(self, request, *args, **kwargs):
+	# current_user = request.user
+	# 	print(current_user.username)
+	# return HttpResponse("Welcome to poll's index!")
+	"""
+	It recieves the response from safaricam
+	"""
+	json_da = json.loads(request.body)
+	print(json_da)
+
+	resultcode = json_da['Body']['stkCallback']['ResultCode']
+	resultdesc = json_da['Body']['stkCallback']['ResultDesc']
+	# phone = json_da["stkCallback"]["CallbackMetadata"]["Item"][4]["Value"]
+	mpesa_reciept = "MPESA"
+			
+	# print(mpesa_reciept)
+	def pay():
+		if resultcode == 0:
+			return "Paid"
+		elif resultcode == 1:
+			return "Faild"
+		else:
+			return "canceled"
+	status = pay()
+	print(status)
+
+	callback = Mpesapay.objects.filter(cash='notpayed')
+	callback.update(cash=status)
+		
+	if status == 'Paid':
+
+		# @login_required
+		# def get(self, *args, **kwargs):
+		# order = Order.objects.filter(user = request.user, ordered='False')
+		# print(order)
+		order = Order.objects.filter(ordered=False)
+		order.update(ordered=True)
+		for item in order:
+			item.save()
+
+			# order.ordered = True
+			# # order.payment = payment
+			# order.save()
+		phonecal = Mpesapay.objects.filter(phone__startswith='254').order_by('-timestamp')[:1].values()
+		for call in phonecal:
+			num = call['phone']
+			phone = str(num)
+			print(phone)
+			# Sends sms to mobile phone
+			message = "Thanks for shopping with Us, We'll deliver your product as soon as possible"
+			username = "refuge"    # use 'sandbox' for development in the test environment
+			api_key = "0baff8f7f0e3e0ca915aabe81477a7d444bd52c98afd11ff9b39079337db3901"      # use your sandbox app API key for development in the test environment
+			africastalking.initialize(username, api_key)
+			# Initialize a service e.g. SMS
+			sms = africastalking.SMS
+			# Use the service synchronously
+			response = sms.send(message, ['+' + phone ])
+		return HttpResponse("Welcome to poll's index!")
+
+	else:
+		phonecal =  phonecal = Mpesapay.objects.filter(phone__startswith='254').order_by('-timestamp')[:1].values()
+		for call in phonecal:
+			num = call['phone']
+			phone = str(num)
+			print(phone)
+			# Sends sms to mobile phone
+			message = "Your payments for shopping with Cosben hardware is %s. Please Try again https://cosben.co.ke"%(status)
+			username = "refuge"    # use 'sandbox' for development in the test environment
+			api_key = "0baff8f7f0e3e0ca915aabe81477a7d444bd52c98afd11ff9b39079337db3901"      # use your sandbox app API key for development in the test environment
+			africastalking.initialize(username, api_key)
+			# Initialize a service e.g. SMS
+			sms = africastalking.SMS
+			# Use the service synchronously
+			response = sms.send(message, ['+' + phone ])
+		return HttpResponse("Welcome to Cosben hardware")

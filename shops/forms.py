@@ -43,3 +43,14 @@ class RefundForm(forms.Form):
 	ref_code = forms.CharField()
 	message = forms.CharField(widget=forms.Textarea)
 	email = forms.EmailField()
+
+class CashPay(forms.Form):
+	payed = forms.CharField(widget=forms.NumberInput(attrs={
+		'class': 'form-control', 'placeholder':'10000'
+		}))
+
+
+class Mpesaform(forms.Form):
+	phone = forms.CharField(widget=forms.NumberInput(attrs={
+		'class': 'form-control', 'placeholder':'254725696052'
+	}))

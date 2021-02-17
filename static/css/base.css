@@ -26,16 +26,16 @@ padding-bottom: 12px;
 }
 
 .table tr:nth-child(odd){
-	background: #B8CAE4;
+	/*background: #B8CAE4;*/
 }
 
 .table tr:nth-child(even){
-	background: #dae5f4;
+	/*background: #dae5f4;*/
 }
 
 th{
-	background-color: #337ab7;
-	color: white;
+	/*background-color: #337ab7;*/
+	/*color: white;*/
 }
 th img {
 	width: 20px;
@@ -79,3 +79,5 @@ th img {
 .show-on-hover:hover > ul.dropdown-menu {
     display: block;    
 }
+
+.my-example-model{margin:0 auto;text-align:center;}
