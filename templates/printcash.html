@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!--  <div class="modal-dialog modal-full-height modal-center" role="document" id="printJS-form"> -->
+
+<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
+                Launch demo modal top
+</button>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+
+  <div class="modal-dialog" role="document" id="printJS-form">
+    <div class="modal-content">
+    
+    <div class="modal-content">
+  		<div class="modal-body">
+  	
+  		<div class="container">
+  			<div class="row">
+  				<div class="col-sm-6" style="font-size: 13px;">
+        		P.O.Box 40100, KISUMU<br/>
+        		TEL : 072569604 <br/>
+        	</div>
+    
+        <div class="col-sm-6" style="font-size: 13px;">
+        	Nyamolori Back Street Mkt<br/>
+        	Next To Bhagini Nursery<br/>
+        	Stall No 66A<br/>
+        </div>
+
+  			</div>
+  		</div>
+  		<hr/>
+  		<center>
+        <h4 class="modal-title w-100" id="myModalLabel" style="font-size: 22px; font-style: 600;">
+        	COSBEN GENENRAL HARDWARE
+        </h4>
+        <p style="font-size: 13px;">Dealers in: General Hardware, Plumbing Materials,<br/>Fitting, Electrical Items and Building Materials</p>
+     
+   		</center>
+  
+        <table class="table caption-top">
+  <caption>
+    
+  </caption>
+
+  <thead>
+    <tr>
+      <th scope="col">No</th>
+      <th scope="col">Items</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Price</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for order_item in order %}
+	{% for print in order_item.items.all %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ print.item }}</td>
+      <td>{{ print.quantity }}</td>
+      <td>{{ print.get_final_price }}&nbsp;&nbsp;<span class="badge badge-success"> (Discout {{ print.get_amout_saved }} ksh)</span>
+      </td>
+  </tr>
+
+		{% endfor %}
+
+      <td colspan="5">
+      <hr/>
+      	<h2> 
+      	Total &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      	{{ order_item.get_total }}
+      	</h2>
+      </td>
+
+  </tbody>
+</table>
+
+<hr>
+<center style="font-size: 13px;">
+<p>For Home Delivery Shop Here
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;www.cosben.co.ke<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;Call : 0725696042</p>
+</p>
+<hr/>
+<h6 style="font-size: 13px;">DATE &nbsp;&nbsp;{{ order_item.timestamp }} || <caption>
+    served by {{user}}
+  </caption></h6><br/>
+</center>
+{% endfor %}
+<p style="font-size: 14px;">Goods Once Sold Will Never Be Returned. THANK YOU</p>
+      </div>
+
+     <br/><br/>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+			<button type="button" onclick="printJS('printJS-form', 'html')" class="btn btn-primary">Print Reciept</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content%}
+

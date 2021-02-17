@@ -74,7 +74,13 @@
       		<a class='btn btn-warning float-right ml-2' href='/checkout/'>Proceed to checkout</a>
       		<a class='btn btn-primary float-right' href='/'>
       		Continue Shopping</a>
+          
+          {% if request.user.is_superuser %}
+          <a class='btn btn-secondary float-right' href='/cashmaney'>
+          cash Pay</a>
+          {% endif %}
       	</td>
+        </tr>
       	{% endif %}
     </tbody>
   </table>

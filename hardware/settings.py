@@ -95,7 +95,7 @@ DATABASES = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-        'NAME': 'hardwarestores',
+        'NAME': 'shophard',
 
         'USER': 'postgres',
 

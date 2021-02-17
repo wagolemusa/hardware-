@@ -29,6 +29,8 @@ class Item(models.Model):
 	quantity = models.IntegerField(default=1)
 	image = models.ImageField()
 	content = models.TextField()
+	timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
+
 
 	def __str__(self):
 		return self.title
@@ -48,15 +50,14 @@ class Item(models.Model):
 			'id': self.id
 		})
 
-
-
-
 class OrderItem(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, 
 		on_delete=models.CASCADE)
 	ordered = models.BooleanField(default=False)
 	item = models.ForeignKey(Item, on_delete=models.CASCADE)
 	quantity = models.IntegerField(default=1)
+	timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
+
 
 	def __str__(self):
 		return "%s  %s" %(self.quantity, self.item.title)
@@ -92,11 +93,16 @@ class Order(models.Model):
 		'Payment', on_delete=models.SET_NULL, blank=True, null=True)
 	coupon = models.ForeignKey(
 		'Coupon', on_delete=models.SET_NULL, blank=True, null=True)
+	cash = models.ForeignKey(
+		'Cash', on_delete=models.SET_NULL, blank=True, null=True)
 	being_delivered = models.BooleanField(default=False)
 	received_requested = models.BooleanField(default=False)
 	refund_requested = models.BooleanField(default=False)
 	refund_granted = models.BooleanField(default=False)
-
+	pay = models.CharField(default='notpayed', max_length=15)
+	timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
+	
+	
 	def __str__(self):
 		return self.user.username
 
@@ -142,8 +148,28 @@ class Refund(models.Model):
 	reason = models.TextField()
 	accepted = models.BooleanField(default=False)
 	email = models.EmailField(max_length=100)
+	timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
 
 	def __str__(self):
 		return "%s" %(self.pk)
 
+class Cash(models.Model):
+	user = models.ForeignKey(settings.AUTH_USER_MODEL,
+														on_delete=models.CASCADE)
+	items = models.ManyToManyField(OrderItem)
+	amount = models.FloatField()
+	timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
 
+	def __str__(self):
+		return self.user.username
+
+class Mpesapay(models.Model):
+	user = models.ForeignKey(settings.AUTH_USER_MODEL,
+													on_delete=models.SET_NULL, blank=True, null=True)
+	amount = models.FloatField()
+	phone = models.BigIntegerField(blank=True, null=True)
+	timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
+	cash = models.CharField(default='notpayed', max_length=15)
+
+	def __str__(self):
+		return self.user.username
