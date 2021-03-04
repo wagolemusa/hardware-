@@ -31,13 +31,14 @@
         </div>
         </li>
        
-      {% if request.user.is_authenticated %}
+      {% if request.user.is_superuser %}
       <li class="nav-item">
         <!-- <a class="nav-link" href="/add_items">Add Items</a> -->
       </li>
-      <li class="nav-item">
+<!--       <li class="nav-item">
         <a class="nav-link" href="/list_items">All Items</a>
-      </li>
+      </li> -->
+      
        <li class="nav-item">
         <a class="nav-link" href="/costomer_list">Customer Service</a>
       </li>
